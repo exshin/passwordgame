@@ -1,5 +1,3 @@
-Mobile Candidates Contact Info Viewer
+Password Game inspired by the password game played by Jimmy Fallon.
 
-to use:
-
-
+Hosted on Heroku.
