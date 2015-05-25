@@ -13,7 +13,8 @@ import json
 from api.password_game import *
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/passwordgame'
+#app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
 db = SQLAlchemy(app)
 
 
@@ -101,7 +102,7 @@ def logout():
       <p><a href="/passwordgame">Return to Home</a></p>
       """
 
-app.secret_key = 'p0^r80j/3yX r~XHH!jm[]]L^x/,?RT'
+app.secret_key = 'p0^r80j/3yx r~XaH!jm[]]L^I/,?RT'
 
 if __name__ == '__main__':
   app.debug = True
