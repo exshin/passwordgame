@@ -8,7 +8,6 @@ class Config(object):
     SECRET_KEY = 'p0^r80j/3yx r~XaH!jm[]]L^I/,?RT'
     SQLALCHEMY_DATABASE_URI = os.environ['DATABASE_URL']
 
-
 class ProductionConfig(Config):
     DEBUG = False
 

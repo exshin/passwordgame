@@ -11,24 +11,13 @@ from datetime import datetime
 from datetime import timedelta
 import json
 from api.password_game import *
+from config import *
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://localhost/passwordgame'
-#app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+app.config.from_object(os.environ['APP_SETTINGS'])
 db = SQLAlchemy(app)
 
-
-class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(80))
-    email = db.Column(db.String(120), unique=True)
-
-    def __init__(self, name, email):
-        self.name = name
-        self.email = email
-
-    def __repr__(self):
-        return '<Name %r>' % self.name
+from models import User
 
 
 @app.route('/')
@@ -65,7 +54,7 @@ def login():
   else:
     session['teams']['a'].append({'user':user,'avatar':avatar})
     session['user_team'] = 'a'
-  user = User('John Doe', 'john.doe@example.com')
+  user = User('JohnDoe', 'john.doe@example.com')
   db.session.add(user)
   db.session.commit()
   return redirect("/passwordgame", code=302)
@@ -107,6 +96,7 @@ app.secret_key = 'p0^r80j/3yx r~XaH!jm[]]L^I/,?RT'
 if __name__ == '__main__':
   app.debug = True
   app.run(host='0.0.0.0',port=80)
+  print(os.environ['APP_SETTINGS'])
 
 
 
