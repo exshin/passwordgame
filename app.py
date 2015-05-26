@@ -15,7 +15,9 @@ from config import *
 
 app = Flask(__name__)
 #app.config.from_object('config.DevelopmentConfig')
-app.config.from_object('config.ProductionConfig')
+if not os.environ.get('APP_SETTINGS'):
+  os.environ['APP_SETTINGS'] = 'config.DevelopmentConfig'
+app.config.from_object(os.environ.get('APP_SETTINGS'))
 db = SQLAlchemy(app)
 
 from models import *
@@ -39,23 +41,11 @@ def game_start():
 def login():
   try:
     # Get log in info from jquery
-    user = str(request.form.get('username_input'))
-    # Add to the team with the fewest players
-    if not session.get('teams'):
-      session['teams'] = {'a':[],'b':[]}
-    if len(session['teams'].get('a')) == len(session['teams'].get('b')):
-      session['teams']['a'].append({'user':user,'avatar':avatar})
-      session['user_team'] = 'a'
-    elif len(session['teams'].get('a')) > len(session['teams'].get('b')):
-      session['teams']['b'].append({'user':user,'avatar':avatar})
-      session['user_team'] = 'b'
-    else:
-      session['teams']['a'].append({'user':user,'avatar':avatar})
-      session['user_team'] = 'a'
-    user = User(user,user+'@fakeemail.com')
+    user_string = str(request.form.get('username_input'))
+    user = User(user_string,user_string+'@fakeemail.com')
     db.session.add(user)
     db.session.commit()
-    session['user'] = user
+    session['user'] = user_string
     # Set random avatar if none was given
     avatar = get_random_avatar()
     session['user_avatar'] = avatar

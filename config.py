@@ -8,8 +8,10 @@ class Config(object):
     TESTING = False
     CSRF_ENABLED = True
     SECRET_KEY = 'p0^r80j/3yx r~XaH!jm[]]L^I/,?RT'
-    #SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
-    SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/passwordgame'
+    if not os.environ.get('DATABASE_URL'):
+      SQLALCHEMY_DATABASE_URI = 'postgresql://localhost/passwordgame'
+    else:
+      SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL')
 
 class ProductionConfig(Config):
     DEBUG = False
