@@ -14,10 +14,11 @@ from api.password_game import *
 from config import *
 
 app = Flask(__name__)
-app.config.from_object(os.environ['APP_SETTINGS'])
+#app.config.from_object('config.DevelopmentConfig')
+app.config.from_object('config.ProductionConfig')
 db = SQLAlchemy(app)
 
-from models import User
+from models import *
 
 
 @app.route('/')
@@ -36,28 +37,32 @@ def game_start():
 
 @app.route('/login/', methods=['POST'])
 def login():
-  # Get log in info from jquery
-  user = str(request.form.get('username_input'))
-  session['user'] = user
-  # Set random avatar if none was given
-  avatar = get_random_avatar()
-  session['user_avatar'] = avatar
-  # Add to the team with the fewest players
-  if not session.get('teams'):
-    session['teams'] = {'a':[],'b':[]}
-  if len(session['teams'].get('a')) == len(session['teams'].get('b')):
-    session['teams']['a'].append({'user':user,'avatar':avatar})
-    session['user_team'] = 'a'
-  elif len(session['teams'].get('a')) > len(session['teams'].get('b')):
-    session['teams']['b'].append({'user':user,'avatar':avatar})
-    session['user_team'] = 'b'
-  else:
-    session['teams']['a'].append({'user':user,'avatar':avatar})
-    session['user_team'] = 'a'
-  user = User('JohnDoe', 'john.doe@example.com')
-  db.session.add(user)
-  db.session.commit()
-  return redirect("/passwordgame", code=302)
+  try:
+    # Get log in info from jquery
+    user = str(request.form.get('username_input'))
+    # Add to the team with the fewest players
+    if not session.get('teams'):
+      session['teams'] = {'a':[],'b':[]}
+    if len(session['teams'].get('a')) == len(session['teams'].get('b')):
+      session['teams']['a'].append({'user':user,'avatar':avatar})
+      session['user_team'] = 'a'
+    elif len(session['teams'].get('a')) > len(session['teams'].get('b')):
+      session['teams']['b'].append({'user':user,'avatar':avatar})
+      session['user_team'] = 'b'
+    else:
+      session['teams']['a'].append({'user':user,'avatar':avatar})
+      session['user_team'] = 'a'
+    user = User(user,user+'@fakeemail.com')
+    db.session.add(user)
+    db.session.commit()
+    session['user'] = user
+    # Set random avatar if none was given
+    avatar = get_random_avatar()
+    session['user_avatar'] = avatar
+    return redirect("/passwordgame", code=302)
+  except Exception as login_error:
+    print login_error
+    return redirect('/error', code=302)
 
 @app.route('/random_word/', methods=['POST','GET'])
 def random_word():
@@ -91,12 +96,17 @@ def logout():
       <p><a href="/passwordgame">Return to Home</a></p>
       """
 
-app.secret_key = 'p0^r80j/3yx r~XaH!jm[]]L^I/,?RT'
+@app.route('/error')
+def error():
+  return """
+      <p>Error has occured</p>
+      <p><a href="/passwordgame">Return to Home</a></p>
+      """
 
 if __name__ == '__main__':
   app.debug = True
   app.run(host='0.0.0.0',port=80)
-  print(os.environ['APP_SETTINGS'])
+
 
 
 
